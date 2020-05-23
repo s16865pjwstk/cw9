@@ -207,6 +207,9 @@ namespace LinqConsoleApp
 
 
             //2. Lambda and Extension methods
+            var res_lamb = Emps.Where(a => a.Job == "Backend programmer")
+                .Select(a => new { a.Ename, a.Job });
+
         }
 
         /// <summary>
@@ -214,7 +217,20 @@ namespace LinqConsoleApp
         /// </summary>
         public void Przyklad2()
         {
-            
+            var ret2 = from emp in Emps
+                       where emp.Job == "Frontend programmer" && emp.Salary > 1000
+                       orderby emp.Ename descending
+                       select new
+                       {
+                           Nazwisko = emp.Ename,
+                           Pensja = emp.Salary,
+                           Stanowisko = emp.Job
+                       };
+
+            var ret2_lambda = Emps.Where(v => v.Job == "Frontend programmer" && v.Salary > 1000)
+                .OrderByDescending(v => v.Ename)
+                .ToList();
+
 
         }
 
@@ -223,7 +239,9 @@ namespace LinqConsoleApp
         /// </summary>
         public void Przyklad3()
         {
-          
+            var ret = (from emp in Emps select emp.Salary).Max();
+            var rest_lambda = (from emp in Emps select emp)
+                .Max(emp => emp.Salary);
         }
 
         /// <summary>
@@ -231,6 +249,16 @@ namespace LinqConsoleApp
         /// </summary>
         public void Przyklad4()
         {
+            var ret = from emp in Emps where emp.Salary == (from emp1 in Emps select emp1.Salary).Max()
+                      select new
+                      {
+                          Zawod = emp.Job,
+                          Nazwisko = emp.Ename
+                      };
+
+            var ret_lambda = Emps.Where(e => e.Salary == Emps.Max(emp1 => emp1.Salary))
+                .Select(e => new { e.Ename, e.Job });
+
 
         }
 
@@ -239,7 +267,13 @@ namespace LinqConsoleApp
         /// </summary>
         public void Przyklad5()
         {
+            var ret = from emp in Emps select new
+                       {
+                           Nazwisko = emp.Ename,
+                           Praca = emp.Job
+                       };
 
+            var ret_lambda = Emps.Select(e => new { Nazwisko = e.Ename, Praca = e.Job });
         }
 
         /// <summary>
@@ -249,7 +283,16 @@ namespace LinqConsoleApp
         /// </summary>
         public void Przyklad6()
         {
+            var ret = from emp in Emps
+                      join dept in Depts on emp.Deptno equals dept.Deptno
+                        select new
+                        {
+                            Nazwisko = emp.Ename,
+                            Praca = emp.Job,
+                            Departament = dept.Dname
+                        };
 
+            var ret_lambda = Emps.Join(Depts, emp => emp.Deptno, dept => dept.Deptno, (emp, dept) => new { emp.Ename, emp.Job, dept.Dname });
         }
 
         /// <summary>
@@ -257,7 +300,14 @@ namespace LinqConsoleApp
         /// </summary>
         public void Przyklad7()
         {
+            var ret = from emp in Emps group emp by emp.Job into pracownicy
+                        select new
+                        {
+                            liczbaPracownikow = pracownicy.Count(),
+                            praca = pracownicy.Key
+                        };
 
+            var ret_lambda = Emps.GroupBy(e => e.Job).Select(ee => ee.Count());
         }
 
         /// <summary>
@@ -266,7 +316,8 @@ namespace LinqConsoleApp
         /// </summary>
         public void Przyklad8()
         {
-
+            var ret = (from emp in Emps where emp.Job == "Backend programmer" select emp).Any();
+            var ret_lambda = Emps.Any(e => e.Job == "Backend programmer");
         }
 
         /// <summary>
